@@ -84,4 +84,40 @@ router.post('/',async(req,res)=>{
         res.status(500).json({message:err.message})
        }
 })
+//needed to be updated
+router.get('/', async (req, res) => {
+    const data = await Url.find({});
+    const result = [];
+    data.forEach((data) => {
+        const name = data.name;
+        const id = data._id;
+        const min_value = data.minimum_value;
+        let i = 0;
+        let ans = 0;
+        data.values.forEach((val) => {
+            if (val == min_value) {
+                ans = i;
+            }
+            i++;
+        });
+        const date = data.dates[ans];
+        result.push({
+            name,
+            id,
+            minimum_value: min_value,
+            date
+        });
+    });
+    return res.send(result);
+});
+
+router.get('/find', async (req, res) => {
+    res.send(await Url.findOne({ _id: req.query.id }));
+});
+
+router.delete('/', async (req, res) => {
+    await Url.findOneAndDelete({ url: req.body.url });
+    await Url.save();
+    return res.status(200).send();
+});
 module.exports=router;
